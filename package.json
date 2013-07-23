@@ -1,0 +1,15 @@
+{
+  "name": "chatt3r",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": "",
+  "author": "",
+  "license": "BSD",
+  "dependencies": {
+    "connect": "2.8.4",
+    "express": "3.3.4",
+    "redis": "0.8.4",
+    "socket.io": "0.9.16"
+  }
+}
