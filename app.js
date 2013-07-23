@@ -6,11 +6,13 @@ var server  = http.createServer(app);
 var io      = socket.listen(server);
 io.set('log level', 1);
 //use redis...
+//TODO: Replace static methods for redis functions to persist data
 
 app.use(express.static(__dirname + '/assets'));
 app.get('/', function(req, res){
   res.sendfile("./chat.html");
 });
+
 
 messages = [];
 
@@ -24,6 +26,12 @@ function save_message(nick, message){
   return message;
 }
 
+function send_old_messages(client) {
+  messages.forEach(function(message){
+    client.emit('messages', message)
+  });
+}
+
 io.sockets.on('connection', function(client){
   console.log('client connected.');
 
@@ -33,6 +41,8 @@ io.sockets.on('connection', function(client){
     console.log('setting nickname: %s', nick);
     client.emit('new-chatter', nick);
     client.broadcast.emit('new-chatter', nick);
+    //when a new user logged, send him all old messages
+    send_old_messages(client);
   });
 
   //new message
@@ -43,7 +53,6 @@ io.sockets.on('connection', function(client){
       client.broadcast.emit('messages', msg);
     });
   });
-
 
 });
 
