@@ -1,0 +1,26 @@
+!!! 5
+html(lang="en")
+  head
+    title Chatt3R
+    link( href="css/bootstrap.min.css", rel="stylesheet", type="text/css" )
+    link( href="css/custom.min.css", rel="stylesheet", type="text/css" )
+    script( src="javascripts/jquery.js", type="text/javascript" )
+    script( src="javascripts/bootstrap.min.js", type="text/javascript" )
+    script( src="/socket.io/socket.io.js", type="text/javascript" )
+    script( src="javascripts/application.js", type="text/javascript" )
+      
+  body
+    .container
+      .row
+        .well.span3
+          ul#chatters.nav.nav-list
+            li.nav-headers Chatters
+
+        .well.span8
+          ul#chat
+
+          hr
+
+          .form          
+            input( type="text", name="new-message", class="input-xlarge" )
+            input( type="button", value="send", class="btn btn-success")

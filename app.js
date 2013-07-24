@@ -8,9 +8,10 @@ io.set('log level', 1);
 //use redis...
 //TODO: Replace static methods for redis functions to persist data
 
+
 app.use(express.static(__dirname + '/assets'));
 app.get('/', function(req, res){
-  res.sendfile("./chat.html");
+  res.sendfile("./views/chat.html");
 });
 
 
@@ -28,7 +29,7 @@ function save_message(nick, message){
 
 function send_old_messages(client) {
   messages.forEach(function(message){
-    client.emit('messages', message)
+    client.emit('messages', { msg: message, clazz: 'info' })
   });
 }
 
@@ -49,8 +50,8 @@ io.sockets.on('connection', function(client){
   client.on('new-message', function(message){ 
     client.get('nick', function(err, nick){
       var msg = save_message(nick, message);
-      client.emit('messages', msg);
-      client.broadcast.emit('messages', msg);
+      client.emit('messages', { msg: msg, clazz: 'success' });
+      client.broadcast.emit('messages', { msg: msg, clazz: 'info' });
     });
   });
 

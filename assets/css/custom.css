@@ -1,3 +1,3 @@
-* { list-style: none;  }
-.container { margin:0 auto; }
-input[type='text'] { height: 20px; }
+* { list-style: none; }
+.container { width: 80%; margin: 50px auto; }
+.form input[type="text"] { height: 28px; }
