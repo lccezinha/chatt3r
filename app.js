@@ -14,7 +14,6 @@ app.get('/', function(req, res){
   res.sendfile("./views/chat.html");
 });
 
-
 messages = [];
 
 function save_message(nick, message){
@@ -52,6 +51,14 @@ io.sockets.on('connection', function(client){
       var msg = save_message(nick, message);
       client.emit('messages', { msg: msg, clazz: 'success' });
       client.broadcast.emit('messages', { msg: msg, clazz: 'info' });
+    });
+  });
+
+  //disconnect
+  client.on('disconnect', function() {
+    client.get('nick', function(err, nick){
+      client.broadcast.emit('remove-chatter', nick);
+      console.log('Client %s disconnected', nick);
     });
   });
 

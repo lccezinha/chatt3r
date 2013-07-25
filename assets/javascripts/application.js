@@ -8,15 +8,17 @@ $(document).ready(function(){
   });
 
   server.on('new-chatter', function(nick) {
-    $("ul#chatters").append("<li>" + nick + "</li>")
+    $("ul#chatters").append("<li id=chatter-" + nick + ">" + nick + "</li>")
   });
 
   server.on('messages', function(data){ 
-    //$("ul#chat").append("<li>[ " + message.when + "] => " + message.author + ": " + message.texto + "</li>")
-    console.log(data)
     $("ul#chat").append("<li><p><span class='badge badge-"+ data.clazz +"'>" + data.msg.author + 
                           "</span>&nbsp;" + data.msg.texto + 
                           "<small class='pull-right'>" + data.msg.when +"</small></p><hr /></li>")
+  });
+
+  server.on('remove-chatter', function(nick){
+    $("ul#chatters").find("li#chatter-" + nick).remove();
   });
 
   $('#send').click(function(){
