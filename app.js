@@ -9,7 +9,12 @@ io.set('log level', 1);
 //TODO: Replace static methods for redis functions to persist data
 
 
-app.use(express.static(__dirname + '/assets'));
+//app.use(express.static(__dirname + '/assets'));
+
+app.use("/stylesheets", express.static(__dirname + '/assets/stylesheets'));
+app.use("/javascripts", express.static(__dirname + '/assets/javascripts'));
+app.use("/images", express.static(__dirname + '/assets/images'));
+
 app.get('/', function(req, res){
   res.sendfile("./views/chat.html");
 });
