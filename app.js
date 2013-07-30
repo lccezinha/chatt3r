@@ -4,6 +4,9 @@ var express = require('express');
 var app     = express();
 var server  = http.createServer(app);
 var io      = socket.listen(server);
+var redis   = require('redis');
+var redisClient = redis.createClient();
+
 io.set('log level', 1);
 //use redis...
 //TODO: Replace static methods for redis functions to persist data
@@ -19,23 +22,36 @@ app.get('/', function(req, res){
   res.sendfile("./views/chat.html");
 });
 
-messages = [];
-
 function save_message(nick, message){
-  message = { 
+  message = JSON.stringify({ 
     author: nick,
     texto: message,
     when: new Date().toLocaleTimeString()
-  }
-  messages.push(message);
-  return message;
+  });
+  
+  redisClient.lpush("messages", message, function(err, response) {
+    redisClient.ltrim("messages", 0, 10);
+  });
+  return JSON.parse(message);
 }
 
 function send_old_messages(client) {
-  messages.forEach(function(message){
-    client.emit('messages', { msg: message, clazz: 'info' })
+  redisClient.lrange("messages", 0, -1, function(err, messages) {
+    msgs = messages.reverse();
+    msgs.forEach(function(message){
+      message = JSON.parse(message);
+      client.emit('messages', { msg: message, clazz: 'info' })
+    });
   });
 }
+
+function show_all_chatters(client){
+  redisClient.smembers('names', function(err, nicks) {
+    nicks.forEach(function(nick){
+      client.emit('new-chatter', nick);
+    });
+  });
+};
 
 io.sockets.on('connection', function(client){
   console.log('client connected.');
@@ -46,6 +62,10 @@ io.sockets.on('connection', function(client){
     console.log('setting nickname: %s', nick);
     client.emit('new-chatter', nick);
     client.broadcast.emit('new-chatter', nick);
+    //when a new user logged, see all onlines users
+    show_all_chatters(client);
+    
+    redisClient.sadd("chatters", nick);
     //when a new user logged, send him all old messages
     send_old_messages(client);
   });
@@ -63,6 +83,7 @@ io.sockets.on('connection', function(client){
   client.on('disconnect', function() {
     client.get('nick', function(err, nick){
       client.broadcast.emit('remove-chatter', nick);
+      redisClient.srem('chatters', nick);
       console.log('Client %s disconnected', nick);
     });
   });
