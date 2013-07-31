@@ -46,7 +46,7 @@ function send_old_messages(client) {
 }
 
 function show_all_chatters(client){
-  redisClient.smembers('names', function(err, nicks) {
+  redisClient.smembers('chatters', function(err, nicks) {
     nicks.forEach(function(nick){
       client.emit('new-chatter', nick);
     });
